@@ -46,11 +46,9 @@ mac{
     # Cocoa helper
     HEADERS +=              $$PWD/mac/cocoainit.h \
                             $$PWD/mac/helper.h \
-                            $$PWD/mac/macnotifier.h \
-                            $$PWD/mac/growlnotifier.h
+                            $$PWD/mac/macnotifier.h
 
     OBJECTIVE_SOURCES +=    $$PWD/mac/cocoainit.mm \
                             $$PWD/mac/helper.mm \
-                            $$PWD/mac/macnotifier.mm \
-                            $$PWD/mac/growlnotifier.mm
+                            $$PWD/mac/macnotifier.mm
 }

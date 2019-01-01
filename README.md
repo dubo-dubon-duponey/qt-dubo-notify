@@ -1,6 +1,16 @@
 # DuboNotify
 
-A cross-platform notification library for QT with a focus on macOS.
+> "Dubo Components" are lightweight, targeted c++ libraries meant for QT applications.
+> They aim at providing *simple to use* interfaces for a range of functionality
+(notification, crash reporting, zero conf, application update, torrent, etc).
+> Fully scriptable, they are primarily meant for javascript (from a QWebEngine) - thought they are usable as well in plain QT.
+> Put together, these components should provide a comprehensive foundation for these building a "WebRunner", similarly to Electron.
+
+DuboNotify is a (tentatively) cross-platform notification library.
+
+macOS only for now.
+
+Licensed under BSD2.
 
 ## How to use
 

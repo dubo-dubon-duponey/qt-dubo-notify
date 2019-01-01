@@ -12,13 +12,14 @@
 #ifndef DUBONOTIFY_MAC_HELPER_H
 #define DUBONOTIFY_MAC_HELPER_H
 
-#import <Foundation/Foundation.h>
 #include <QString>
 #include <QPixmap>
 
 #include <QDebug>
 #include <QApplication>
 #include <qpa/qplatformnativeinterface.h>
+
+#import <Foundation/Foundation.h>
 
 inline QPlatformNativeInterface::NativeResourceForIntegrationFunction resolvePlatformFunction(const QByteArray &name)
 {

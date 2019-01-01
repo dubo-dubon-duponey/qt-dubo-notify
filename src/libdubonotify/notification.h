@@ -15,8 +15,12 @@
 #include "global.h"
 #include <QObject>
 #include <QPixmap>
+#include <QBuffer>
 #include <QMap>
 #include <QVariant>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 /*! \namespace DuboNotify
 \brief The library namespace.
@@ -39,44 +43,53 @@ class LIBDUBONOTIFYSHARED_EXPORT Notification : public QObject
   Q_OBJECT
 
 public:
-    explicit Notification(QObject * parent):QObject(parent){}
+    explicit Notification(QObject * parent):QObject(parent){
+        connect(
+            &netManager, SIGNAL (finished(QNetworkReply*)),
+            this, SLOT (iconDownloaded(QNetworkReply*))
+         );
+    }
 
     /*! \brief The "title".*/
-    Q_PROPERTY(QString  Title               MEMBER Title        NOTIFY titleChanged)
+    Q_PROPERTY(QString  Title               MEMBER Title                NOTIFY titleChanged)
     /*! \brief The "subtitle".*/
-    Q_PROPERTY(QString  Subtitle            MEMBER Subtitle     NOTIFY subtitleChanged)
+    Q_PROPERTY(QString  Subtitle            MEMBER Subtitle             NOTIFY subtitleChanged)
     /*! \brief Some additional informative text.*/
-    Q_PROPERTY(QString  Informative         MEMBER Informative  NOTIFY informativeChanged)
+    Q_PROPERTY(QString  Informative         MEMBER Informative          NOTIFY informativeChanged)
     /*! \brief An icon.*/
-    Q_PROPERTY(QPixmap  Icon                READ   getIcon WRITE setIcon    NOTIFY iconChanged)
+    // Q_PROPERTY(QPixmap  Icon                READ getIcon WRITE setIcon  NOTIFY iconChanged)
+    Q_PROPERTY(QString  Icon                READ getIcon WRITE setIcon  NOTIFY iconChanged)
     /*! \brief A unique identifier. Notifications with the same identifier will only be presented one at a time. */
-    Q_PROPERTY(QString  Identifier          MEMBER Identifier   NOTIFY identifierChanged)
+    Q_PROPERTY(QString  Identifier          MEMBER Identifier           NOTIFY identifierChanged)
     /*! \brief If this is a "replyable" notification, the placeholder text in the response text field.*/
     Q_PROPERTY(QString  ResponsePlaceholder MEMBER ResponsePlaceholder  NOTIFY responsePlaceholderChanged)
     /*! \brief If the notification should be "actionable", set this to true. Ignored if the notification is "replyable".*/
-    Q_PROPERTY(bool     HasActionButton     MEMBER HasActionButton)
+    Q_PROPERTY(bool     HasActionButton     MEMBER HasActionButton      NOTIFY hasActionButtonChanged)
     /*! \brief If the notification should be "replyable", set this to true.*/
-    Q_PROPERTY(bool     HasReplyButton      MEMBER HasReplyButton)
+    Q_PROPERTY(bool     HasReplyButton      MEMBER HasReplyButton       NOTIFY hasReplyButtonChanged)
     /*! \brief If the notification is "actionable", the title of the action button. */
-    Q_PROPERTY(QString  ActionButtonTitle   MEMBER ActionButtonTitle)
+    Q_PROPERTY(QString  ActionButtonTitle   MEMBER ActionButtonTitle    NOTIFY hasButtonTitleChanged)
     /*! \brief If the notification is "actionable", the title of the "close" button. */
-    Q_PROPERTY(QString  OtherButtonTitle    MEMBER OtherButtonTitle)
+    Q_PROPERTY(QString  OtherButtonTitle    MEMBER OtherButtonTitle     NOTIFY otherButtonTitleChanged)
     /*! \brief A soundname (see sounds). */
-    Q_PROPERTY(QString  SoundName           MEMBER SoundName)
+    Q_PROPERTY(QString  SoundName           MEMBER SoundName            NOTIFY soundNameChanged)
     /*! \brief Actionable notifications may present additional sub actions (list of strings), displayed when clicking the main action button. */
-    Q_PROPERTY(QVariant AdditionalActions   READ   getAdditionalActions WRITE setAdditionalActions)
+    Q_PROPERTY(QVariant AdditionalActions   READ   getAdditionalActions WRITE setAdditionalActions
+                                                                        NOTIFY additionalActionsChanged)
     /*! \brief A map of strings usable to attach information to the notification (typically, user information). */
-    Q_PROPERTY(QVariant UserInfo            READ   getUserInfo WRITE setUserInfo)
+    Q_PROPERTY(QVariant UserInfo            READ   getUserInfo WRITE setUserInfo
+                                                                        NOTIFY userInfoChanged)
 
     /*! \brief For actionable notifications with additional actions, whether to force the main action button to display as a dropdown. */
-    Q_PROPERTY(bool     _showAlternate      MEMBER _showAlternate)
+    Q_PROPERTY(bool     _showAlternate      MEMBER _showAlternate       NOTIFY _showAlternateChanged)
 
     /*! \brief If the notification is replyable, will hold the user answer. */
-    Q_PROPERTY(QString  Response            MEMBER Response)
+    Q_PROPERTY(QString  Response            MEMBER Response             NOTIFY responseChanged)
     /*! \brief If the notification has been activated, the "type" of activation (see activation consts). */
-    Q_PROPERTY(int      ActivationType      MEMBER ActivationType)
+    Q_PROPERTY(int      ActivationType      MEMBER ActivationType       NOTIFY activationTypeChanged)
     /*! \brief If the notification has been activated through an additional action, this holds "which" action. */
-    Q_PROPERTY(QString  AdditionalActivationAction MEMBER AdditionalActivationAction)
+    Q_PROPERTY(QString  AdditionalActivationAction MEMBER AdditionalActivationAction
+                                                                        NOTIFY additionalActivationActionChanged)
 
     /*! \brief User has clicked the body of the notification. */
     Q_PROPERTY(int      ACTIVATION_CONTENT  READ   ACTIVATION_CONTENT                   CONSTANT)
@@ -87,7 +100,6 @@ public:
     /*! \brief User has used an additional action to activate he notification. */
     Q_PROPERTY(int      ACTIVATION_ADDITIONAL_ACTION READ ACTIVATION_ADDITIONAL_ACTION  CONSTANT)
 
-    // SCRIPTABLE
     // Sounds
     Q_PROPERTY(QString  SOUND_NO            READ   SOUND_NO         CONSTANT)
     Q_PROPERTY(QString  SOUND_DEFAULT       READ   SOUND_DEFAULT    CONSTANT)
@@ -110,7 +122,7 @@ public:
     QString Title = "";
     QString Subtitle = "";
     QString Informative = "";
-    QPixmap Icon = QPixmap();
+    QPixmap * Icon = new QPixmap();
     QString Identifier = "";
     QString ResponsePlaceholder = "";
     bool    HasActionButton = false;
@@ -132,6 +144,7 @@ public:
     int ACTIVATION_REPLIED()            const {return 3;}
     int ACTIVATION_ADDITIONAL_ACTION()  const {return 4;}
 
+    // XXX FIXME no sound doesn't work - it fallbacks on default
     QString SOUND_NO()          const {return QString::fromLatin1("");}
     QString SOUND_DEFAULT()     const {return QString::fromLatin1("Default");}
     QString SOUND_BASSO()       const {return QString::fromLatin1("Basso");}
@@ -157,19 +170,28 @@ signals:
     void iconChanged();
     void identifierChanged();
     void responsePlaceholderChanged();
+    void hasActionButtonChanged();
+    void hasReplyButtonChanged();
+    void hasButtonTitleChanged();
+    void otherButtonTitleChanged();
+    void soundNameChanged();
+    void _showAlternateChanged();
+    void responseChanged();
+    void activationTypeChanged();
+    void additionalActivationActionChanged();
+    void additionalActionsChanged();
+    void userInfoChanged();
 
-private:
-    QPixmap getIcon() const {
-        return Icon;
+private slots:
+    void iconDownloaded(QNetworkReply* pReply){
+        QByteArray data = pReply->readAll();
+        pReply->deleteLater();
+        Icon->loadFromData(data);
+        emit iconChanged();
     }
 
-    void setIcon(QPixmap &pixmap) {
-        Icon = pixmap;
-    }
-
-    QVariant getAdditionalActions() const
-    {
-        return QVariant(AdditionalActions);
+    void setIcon(const QString url) {
+        netManager.get(QNetworkRequest(url));
     }
 
     void setAdditionalActions(const QVariant & list)
@@ -179,6 +201,32 @@ private:
         for (int i = 0; i < object.length(); ++i) {
             AdditionalActions << object[i].toString();
         }
+    }
+
+    void setUserInfo(const QVariant & list)
+    {
+        UserInfo.clear();
+        QMap<QString, QVariant> object = list.toMap();
+        QMap<QString, QVariant>::const_iterator i = object.constBegin();
+        while (i != object.constEnd()) {
+            UserInfo[i.key()] = i.value().toString();
+            ++i;
+        }
+    }
+
+private:
+    QNetworkAccessManager netManager;
+
+    QString getIcon() const {
+        QByteArray byteArray;
+        QBuffer buffer(&byteArray);
+        Icon->save(&buffer, "PNG");
+        return QString("data:image/png;base64,") + byteArray.toBase64();
+    }
+
+    QVariant getAdditionalActions() const
+    {
+        return QVariant(AdditionalActions);
     }
 
     QVariant getUserInfo() const
@@ -193,16 +241,6 @@ private:
         return QVariant(list);
     }
 
-    void setUserInfo(const QVariant & list)
-    {
-        UserInfo.clear();
-        QMap<QString, QVariant> object = list.toMap();
-        QMap<QString, QVariant>::const_iterator i = object.constBegin();
-        while (i != object.constEnd()) {
-            UserInfo[i.key()] = i.value().toString();
-            ++i;
-        }
-    }
 };
 
 }

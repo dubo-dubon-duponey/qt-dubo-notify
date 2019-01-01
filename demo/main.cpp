@@ -84,7 +84,7 @@ int mainNoJavascript(int argc, char *argv[])
     notif->setProperty("AdditionalActions", QVariant(list));
     notif->ResponsePlaceholder = "Placeholder";
     notif->SoundName = notif->SOUND_BLOW();
-    notif->Icon = QPixmap(":/demo.jpg");
+    notif->Icon = new QPixmap(":/demo.jpg");
     notif->UserInfo["a ∞"] = "thing";
     notif->UserInfo["another ∞"] = "thing";
     notif->Title = "Another";
@@ -117,7 +117,7 @@ int mainJavascript(int argc, char *argv[])
 
 int main(int argc, char *argv[]){
     // Delegated to javascript
-    // return mainJavascript(argc, argv);
+    return mainJavascript(argc, argv);
     // Purely c++
-    return mainNoJavascript(argc, argv);
+    // return mainNoJavascript(argc, argv);
 }

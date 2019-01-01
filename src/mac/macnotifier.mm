@@ -16,40 +16,46 @@
 #include "cocoainit.h"
 #include "macnotifier.h"
 
+/*
 // Hide away platform details
 class MacNotifier::Private
 {
     public:
         id NotificationCenterWrapped;
 };
+*/
 
 @interface DuboNotifyNotificationCenterDelegate : NSObject <NSUserNotificationCenterDelegate> {
-    MacNotifier* observer;
 }
-    - (DuboNotifyNotificationCenterDelegate*) initialise:(MacNotifier*)observer;
-    - (void) userNotificationCenter:(NSUserNotificationCenter *)center didDeliverNotification:(NSUserNotification *)notification;
-    - (void) userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification;
-    - (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification;
+
+  @property (atomic) MacNotifier* observer;
+- (DuboNotifyNotificationCenterDelegate*) initialise:(MacNotifier*)observer;
+- (void) userNotificationCenter:(NSUserNotificationCenter *)center didDeliverNotification:(NSUserNotification *)notification;
+- (void) userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification;
+- (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification;
 @end
 
-@implementation DuboNotifyNotificationCenterDelegate
+@implementation DuboNotifyNotificationCenterDelegate{
+}
+
 - (DuboNotifyNotificationCenterDelegate*) initialise:(MacNotifier*)obs
 {
     if ( (self = [super init]) )
-        self->observer = obs;
+        self.observer = obs;
     return self;
 }
 
 - (void) userNotificationCenter:(NSUserNotificationCenter *)center didDeliverNotification:(NSUserNotification *)notification
 {
     Q_UNUSED(center);
-    self->observer->notificationDelivered(notification);
+
+    self.observer->notificationDelivered(notification);
 }
 
 - (void) userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
 {
     Q_UNUSED(center);
-    self->observer->notificationClicked(notification);
+    self.observer->notificationClicked(notification);
 }
 
 - (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification
@@ -69,8 +75,8 @@ MacNotifier::MacNotifier(DuboNotify::Notifier *parent) : OSNotifier(parent)
     DuboNotifyNotificationCenterDelegate * delegate = [[DuboNotifyNotificationCenterDelegate alloc] initialise: this];
 
     // Store it
-    d = new MacNotifier::Private();
-    d->NotificationCenterWrapped = delegate;
+    /*d = new MacNotifier::Private();
+    d->NotificationCenterWrapped = delegate;*/
 
     // Set it as delegate
     [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:delegate];
@@ -87,85 +93,73 @@ MacNotifier::~MacNotifier()
 
 void MacNotifier::notificationDelivered(id notification)
 {
-    qDebug() << "Delivered" << [notification identifier];
+    NSUserNotification * notif = notification;
+    qDebug() << "Delivered" << [notif identifier];
+
+    // Get the notifier
     DuboNotify::Notifier * notifier = qobject_cast<DuboNotify::Notifier *>(this->parent());
-    DuboNotify::Notification * n = notifier->read(toQString([notification identifier]));
+    // Get a notification object (either from cache, or build a new one)
+    DuboNotify::Notification * n = notifier->read(toQString([notif identifier]));
 
+    // Set the userInfo in case it's a new object
     QMap<QString, QString> info = QMap<QString, QString>();
-    for(id key in [notification userInfo]){
-        NSLog(@"key=%@ value=%@", key, [[notification userInfo] objectForKey:key]);
-        info[toQString(key)] = toQString([[notification userInfo] objectForKey:key]);
+    for(id key in [notif userInfo]){
+        NSLog(@"key=%@ value=%@", key, [[notif userInfo] objectForKey:key]);
+        info[toQString(key)] = toQString([[notif userInfo] objectForKey:key]);
     }
-
     n->UserInfo = info;
+
+    // Emit
     emit notifier->presented(n);
 }
 
 void MacNotifier::notificationClicked(id notification)
 {
+    NSUserNotification * notif = notification;
     qDebug() << "Clicked";
+
+    // Get the notifier
     DuboNotify::Notifier * notifier = qobject_cast<DuboNotify::Notifier *>(this->parent());
-    DuboNotify::Notification * n = notifier->read(toQString([notification identifier]));
+    // Get a notification object (either from cache, or build a new one)
+    DuboNotify::Notification * n = notifier->read(toQString([notif identifier]));
 
-    // n->Response = toQString([notification response]);
-    // n->Response = toQString([[notification response] data]);
-
-//    n->Response = toQString([[NSString alloc] initWithString:[[notification response] string]]);// encoding:NSUTF8StringEncoding]);
-    n->Response = toQString([[notification response] string]);
-    n->Identifier = toQString([notification identifier]);
-    /*
-    n->response = [notification actualDeliveryDate];
-    n->response = [notification isPresented];
-    n->response = [notification isRemote];
-    */
-    n->ActivationType = [notification activationType];
-    n->AdditionalActivationAction = toQString([[notification additionalActivationAction] identifier]);
-
-    /*
-NSUserNotification.ActivationType
-case none
-The user did not interact with the notification alert.
-
-case contentsClicked (1)
-The user clicked on the contents of the notification alert.
-
-case actionButtonClicked (2)
-The user clicked on the action button of the notification alert.
-
-case replied (3)
-The user replied to the notification.
-
-case additionalActionClicked (4)
-The user clicked on the additional action button of the notification alert.
-     */
-
+    // Set the userInfo in case it's a new object
     QMap<QString, QString> info = QMap<QString, QString>();
-    for(id key in [notification userInfo]){
-        NSLog(@"key=%@ value=%@", key, [[notification userInfo] objectForKey:key]);
-        info[toQString(key)] = toQString([[notification userInfo] objectForKey:key]);
+    for(id key in [notif userInfo]){
+        NSLog(@"key=%@ value=%@", key, [[notif userInfo] objectForKey:key]);
+        info[toQString(key)] = toQString([[notif userInfo] objectForKey:key]);
     }
-
     n->UserInfo = info;
+    // Client should assume it doesn't necessarily get these, which are purely informative and should not contain data
+    /*    n->Title = toQString([notification title]);
+        n->Subtitle = toQString([notification subtitle]);
+        n->Informative = toQString([notification informativeText]);
+    //    n->SoundName = toQString([notification soundName]);
+    //    n->HasReplyButton = [notification hasReplyButton];
+    //    n->HasActionButton = [notification hasActionButton];
+    //    n->OtherButtonTitle = toQString([notification otherButtonTitle]);
+    */
 
-    // In case the notification was dangling, we populate it from the dispatched info here
-/*    n->Title = toQString([notification title]);
-    n->Subtitle = toQString([notification subtitle]);
-    n->Informative = toQString([notification informativeText]);
-//    n->SoundName = toQString([notification soundName]);
-//    n->HasReplyButton = [notification hasReplyButton];
-//    n->HasActionButton = [notification hasActionButton];
-//    n->OtherButtonTitle = toQString([notification otherButtonTitle]);
-*/
+    // Set any property pertaining to the response
+    n->setProperty("Response", toQString([[notif response] string]));
+    n->setProperty("AdditionalActivationAction", toQString([[notif additionalActivationAction] identifier]));
+    n->setProperty("ActivationType", int([notif activationType]));
+    /*
+    [notification actualDeliveryDate];
+    [notification isPresented];
+    [notification isRemote];
+    */
 
-
+    // Careful! Changes are not live in the notification yet :s
+    // XXX this is heinous shit - need something better - some of the properties may or may not have changed...
     emit notifier->clicked(n);
 }
 
 bool MacNotifier::dispatch(DuboNotify::Notification * data)
 {
     // Create the nofication
-    Class userNotificationClass     = NSClassFromString(@"NSUserNotification");
-    id userNotification             = [[userNotificationClass alloc] init];
+    // Class userNotificationClass     = NSClassFromString(@"NSUserNotification");
+    NSUserNotification * userNotification             = [[NSUserNotification alloc] init];
 
     // Set standard values
     [userNotification setValue:toNSString(data->Title) forKey:@"title"];
@@ -190,9 +184,9 @@ bool MacNotifier::dispatch(DuboNotify::Notification * data)
         if (data->AdditionalActions.length() > 0){
             NSMutableArray * actions = [[NSMutableArray alloc] init];
             for (int i = 0; i < data->AdditionalActions.length(); ++i) {
-                Class userNotificationActionClass = NSClassFromString(@"NSUserNotificationAction");
-                id action ;
-                action = [[userNotificationActionClass alloc] init];
+                // Class userNotificationActionClass = NSClassFromString(@"NSUserNotificationAction");
+                NSUserNotificationAction * action ;
+                action = [[NSUserNotificationAction alloc] init];
                 [action setValue:toNSString(data->AdditionalActions[i]) forKey:@"identifier"];
                 [action setValue:toNSString(data->AdditionalActions[i]) forKey:@"title"];
                 [actions addObject:action];
@@ -203,8 +197,8 @@ bool MacNotifier::dispatch(DuboNotify::Notification * data)
         [userNotification setValue:@(data->_showAlternate) forKey:@"_alwaysShowAlternateActionMenu"];
     }
 
-    if (!data->Icon.isNull()){
-        [userNotification setValue:toNSImage(data->Icon) forKey:@"contentImage"];
+    if (!data->Icon->isNull()){
+        [userNotification setValue:toNSImage(* data->Icon) forKey:@"contentImage"];
     }
 
     QMap<QString, QString>::const_iterator i = data->UserInfo.constBegin();
@@ -217,8 +211,8 @@ bool MacNotifier::dispatch(DuboNotify::Notification * data)
     [userNotification setUserInfo:userInfo];
 
     // Dispatch
-    id userNotificationCenterClass = NSClassFromString(@"NSUserNotificationCenter");
-    [[userNotificationCenterClass performSelector:@selector(defaultUserNotificationCenter)] performSelector:@selector(deliverNotification:) withObject:userNotification];
+    NSUserNotificationCenter *notificationCenter = [NSUserNotificationCenter defaultUserNotificationCenter];
+    [notificationCenter deliverNotification:userNotification];
     return true;
 }
 

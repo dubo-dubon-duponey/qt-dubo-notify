@@ -1,4 +1,4 @@
-error("Only macOS is supported right now.")
+error("Only macOS & linux with DBus is supported right now.")
 
 ###############
 # Any of the following may be overriden by the environment
@@ -24,6 +24,6 @@ DUBO_EXTERNAL =
 DUBO_DESTDIR =
 
 # Flags to use in order to link to the third-party (lib only)
-DUBO_LIBS = -ldnssd
+DUBO_LIBS =
 # Special include paths (appended to external deps, if any)  (lib only)
 DUBO_INC =

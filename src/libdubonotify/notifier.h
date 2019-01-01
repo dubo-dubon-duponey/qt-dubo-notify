@@ -41,9 +41,7 @@ public:
     /*! \brief Create a new blank notification and returns it.*/
     Q_INVOKABLE QVariant create();
     /*! \brief Dispatch a notification to the user.*/
-    Q_INVOKABLE bool dispatch(QVariant notification);
-    /*! \brief Dispatch a notification to the user.*/
-    bool dispatch(Notification * notification);
+    Q_INVOKABLE bool dispatch(Notification * notification);
     /*! \brief Remove a notification.*/
     Q_INVOKABLE bool remove(const QString &identifier);
     /*! \brief Remove all notifications.*/

@@ -1,5 +1,5 @@
 TEMPLATE = lib
-QT = core widgets
+QT = core widgets network
 
 PROJECT_ROOT = $$PWD/..
 include($$PROJECT_ROOT/config/qmakeitup.pri)

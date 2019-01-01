@@ -56,17 +56,6 @@ bool Notifier::canNotify()
 }
 */
 
-bool Notifier::dispatch(QVariant notification)
-{
-    QObject * object = qvariant_cast<QObject *>(notification);
-    Notification * note = qobject_cast<Notification *>(object);
-
-    // Add into the map with the identifier
-    d->notificationsMap[note->Identifier] = note;
-    d->notifier->dispatch(note);
-    return true;
-}
-
 bool Notifier::dispatch(Notification * notification)
 {
     d->notificationsMap[notification->Identifier] = notification;
@@ -74,19 +63,20 @@ bool Notifier::dispatch(Notification * notification)
     return true;
 }
 
-
 bool Notifier::remove(const QString &identifier)
 {
-    if (!d->notificationsMap.contains(identifier))
-        return false;
     d->notifier->remove(identifier);
-    delete d->notificationsMap[identifier];
+    QMap<QString, DuboNotify::Notification*>::iterator i = d->notificationsMap.find(identifier);
+    if (i == d->notificationsMap.constEnd())
+        return false;
+    d->notificationsMap.erase(i);
     return true;
 }
 
 bool Notifier::removeAll()
 {
     d->notifier->clean();
+    d->notificationsMap = QMap<QString, DuboNotify::Notification *>();
     return true;
 }
 
@@ -102,9 +92,8 @@ Notification * Notifier::read(const QString &identifier)
 
 QVariant Notifier::create()
 {
-    return QVariant::fromValue((QObject *) new Notification(this));
+    return QVariant::fromValue(static_cast<QObject *>(new Notification(this)));
 }
-
 
 /*
 void Notifier::notify3(QObject * parent, Notification * notification)

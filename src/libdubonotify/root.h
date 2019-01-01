@@ -62,11 +62,11 @@ public:
     Q_PROPERTY(const QString QT READ getQt CONSTANT)
 
     /*! \brief The name of the underlying third-party library if any.*/
-    Q_PROPERTY(const QString PLUGIN_NAME READ getLibName)
+    Q_PROPERTY(const QString PLUGIN_NAME READ getLibName CONSTANT)
     /*! \brief The version of the underlying third-party library if any.*/
-    Q_PROPERTY(const QString PLUGIN_VERSION READ getLibVersion)
+    Q_PROPERTY(const QString PLUGIN_VERSION READ getLibVersion CONSTANT)
     /*! \brief The revision of the underlying third-party library if any.*/
-    Q_PROPERTY(const QString PLUGIN_REVISION READ getLibRevision)
+    Q_PROPERTY(const QString PLUGIN_REVISION READ getLibRevision CONSTANT)
 
 private:
     /*! \cond */

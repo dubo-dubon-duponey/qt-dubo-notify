@@ -3,15 +3,12 @@
         <meta charset="utf8" />
         <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
         <script>
-        new QWebChannel(qt.webChannelTransport, function(channel){
-            // Purely for debug
-            window.XXX = channel.objects;
-
+        window.addEventListener("roxee", function(e){
             // Our main object
-            var notifier = channel.objects.Dubo;
+            var notifier = e.API.notifier;
 
             // Display library information
-            var infos = channel.objects.Root;
+            var infos = e.API.root;
             var iNode = document.getElementById("info");
             var list = ["NAME", "VENDOR", "VERSION", "REVISION", "CHANGESET", "BUILD", "LINK", "QT", "PLUGIN_NAME", "PLUGIN_VERSION", "PLUGIN_REVISION"];
 
@@ -127,6 +124,18 @@
             rem = document.getElementById("removeall");
             rem.removeAttribute("disabled");
             rem.onclick = removeall;
+        });
+
+        window.addEventListener("load", function(){
+            new QWebChannel(qt.webChannelTransport, function(channel){
+                var e = new Event("roxee");
+                window.Dubo = window.Dubo || {};
+                e.API = window.Dubo["notify"] = {
+                    root: channel.objects.Root,
+                    notifier: channel.objects.Notifier,
+                };
+                window.dispatchEvent(e);
+            });
         });
 
         </script>

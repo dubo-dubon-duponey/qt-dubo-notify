@@ -110,7 +110,7 @@ int mainJavascript(int argc, char *argv[])
     // Attach objects to the javascript context
     DuboNotify::Root * root = new DuboNotify::Root();
     chan->registerObject("Root", root);
-    chan->registerObject("Dubo", notifier);
+    chan->registerObject("Notifier", notifier);
 
     return app.exec();
 }

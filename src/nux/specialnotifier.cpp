@@ -1,5 +1,6 @@
 /*
  * The linux part of the notifier is largely copied from BitCoin repository. See: https://github.com/bitcoin/bitcoin/blob/master/COPYING
+ * Originally published under MIT License.
  *
  * Modified by Dubo.
  *

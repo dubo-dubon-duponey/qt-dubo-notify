@@ -15,17 +15,15 @@
 #include <QApplication>
 #include "osnotifier.h"
 
-
-
 #ifdef Q_OS_MAC
 #include "mac/macnotifier.h"
 #elif defined(Q_OS_UNIX) && defined(Q_DBUS_EXPORT)
 #include "nux/specialnotifiernux.h"
 #else
-class SpecialNotifier : public DuboPlatipus::BaseNotifier
+class SpecialNotifier : public DuboPlatipus::OSNotifier
 {
 public:
-    explicit SpecialNotifier(QObject * parent = nullptr): DuboPlatipus::BaseNotifier(parent)
+    explicit SpecialNotifier(QObject * parent = nullptr): DuboPlatipus::OSNotifier(parent)
     {
 
     }

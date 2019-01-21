@@ -63,11 +63,6 @@ public:
     Q_PROPERTY(QString  Identifier          MEMBER Identifier           NOTIFY identifierChanged)
     /*! \brief If this is a "replyable" notification, the placeholder text in the response text field.*/
     Q_PROPERTY(QString  ResponsePlaceholder MEMBER ResponsePlaceholder  NOTIFY responsePlaceholderChanged)
-    /*! \brief If the notification should be "actionable", set this to true. Ignored if the notification is "replyable".*/
-    Q_PROPERTY(bool     HasActionButton     MEMBER HasActionButton      NOTIFY hasActionButtonChanged)
-    /*! \brief If the notification should be "replyable", set this to true.*/
-    Q_PROPERTY(bool     HasReplyButton      MEMBER HasReplyButton       NOTIFY hasReplyButtonChanged)
-    /*! \brief If the notification is "actionable", the title of the action button. */
     Q_PROPERTY(QString  ActionButtonTitle   MEMBER ActionButtonTitle    NOTIFY hasButtonTitleChanged)
     /*! \brief If the notification is "actionable", the title of the "close" button. */
     Q_PROPERTY(QString  OtherButtonTitle    MEMBER OtherButtonTitle     NOTIFY otherButtonTitleChanged)
@@ -79,17 +74,13 @@ public:
     /*! \brief A map of strings usable to attach information to the notification (typically, user information). */
     Q_PROPERTY(QVariant UserInfo            READ   getUserInfo WRITE setUserInfo
                                                                         NOTIFY userInfoChanged)
-
-    /*! \brief For actionable notifications with additional actions, whether to force the main action button to display as a dropdown. */
-    Q_PROPERTY(bool     _showAlternate      MEMBER _showAlternate       NOTIFY _showAlternateChanged)
-
     /*! \brief If the notification is replyable, will hold the user answer. */
     Q_PROPERTY(QString  Response            MEMBER Response             NOTIFY responseChanged)
-    /*! \brief If the notification has been activated, the "type" of activation (see activation consts). */
-    Q_PROPERTY(int      ActivationType      MEMBER ActivationType       NOTIFY activationTypeChanged)
     /*! \brief If the notification has been activated through an additional action, this holds "which" action. */
     Q_PROPERTY(QString  AdditionalActivationAction MEMBER AdditionalActivationAction
                                                                         NOTIFY additionalActivationActionChanged)
+    /*! \brief If the notification has been activated, the "type" of activation (see activation consts). */
+    Q_PROPERTY(int      ActivationType      MEMBER ActivationType       NOTIFY activationTypeChanged)
 
     /*! \brief User has clicked the body of the notification. */
     Q_PROPERTY(int      ACTIVATION_CONTENT  READ   ACTIVATION_CONTENT                   CONSTANT)
@@ -99,6 +90,14 @@ public:
     Q_PROPERTY(int      ACTIVATION_REPLIED  READ   ACTIVATION_REPLIED                   CONSTANT)
     /*! \brief User has used an additional action to activate he notification. */
     Q_PROPERTY(int      ACTIVATION_ADDITIONAL_ACTION READ ACTIVATION_ADDITIONAL_ACTION  CONSTANT)
+
+    /*! \brief If the notification should be "actionable", set this to true. Ignored if the notification is "replyable".*/
+    Q_PROPERTY(bool     HasActionButton     MEMBER HasActionButton      NOTIFY hasActionButtonChanged)
+    /*! \brief If the notification should be "replyable", set this to true.*/
+    Q_PROPERTY(bool     HasReplyButton      MEMBER HasReplyButton       NOTIFY hasReplyButtonChanged)
+    /*! \brief If the notification is "actionable", the title of the action button. */
+    /*! \brief For actionable notifications with additional actions, whether to force the main action button to display as a dropdown. */
+    Q_PROPERTY(bool     _showAlternate      MEMBER _showAlternate       NOTIFY _showAlternateChanged)
 
     // Sounds
     Q_PROPERTY(QString  SOUND_NO            READ   SOUND_NO         CONSTANT)
@@ -125,24 +124,24 @@ public:
     QPixmap * Icon = new QPixmap();
     QString Identifier = "";
     QString ResponsePlaceholder = "";
-    bool    HasActionButton = false;
-    bool    HasReplyButton = false;
     QString ActionButtonTitle = "";
     QString OtherButtonTitle = "";
     QString SoundName = "DEFAULT";
     QList<QString> AdditionalActions = QList<QString>();
     QMap<QString, QString> UserInfo = QMap<QString, QString>();
-
-    bool    _showAlternate = true;
-
     QString Response = "";
     QString AdditionalActivationAction = "";
-    int     ActivationType = 0;
 
+    int ActivationType = 0;
     int ACTIVATION_CONTENT()            const {return 1;}
     int ACTIVATION_ACTION()             const {return 2;}
     int ACTIVATION_REPLIED()            const {return 3;}
     int ACTIVATION_ADDITIONAL_ACTION()  const {return 4;}
+
+    bool    HasActionButton = false;
+    bool    HasReplyButton = false;
+    bool    _showAlternate = true;
+
 
     // XXX FIXME no sound doesn't work - it fallbacks on default
     QString SOUND_NO()          const {return QString::fromLatin1("");}

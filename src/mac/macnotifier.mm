@@ -48,7 +48,6 @@ class MacNotifier::Private
 - (void) userNotificationCenter:(NSUserNotificationCenter *)center didDeliverNotification:(NSUserNotification *)notification
 {
     Q_UNUSED(center);
-
     self.observer->notificationDelivered(notification);
 }
 

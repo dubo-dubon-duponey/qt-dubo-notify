@@ -10,24 +10,25 @@
  */
 
 #include <Cocoa/Cocoa.h>
+#include <qpa/qplatformnativeinterface.h>
 
 #include "helper.h"
 
+/*
 CGImageRef toCGImageRef(const QPixmap &pixmap)
 {
-    QPlatformNativeInterface::NativeResourceForIntegrationFunction func = resolvePlatformFunction("qimagetocgimage");
+    QPlatformNativeInterface::NativeResourceForIntegrationFunction func = QApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("qimagetocgimage");
     if (func) {
         typedef CGImageRef (*QImageToCGImageFunction)(const QImage &image);
         return reinterpret_cast<QImageToCGImageFunction>(func)(pixmap.toImage());
     }
 
-    return NULL;
+    return nullptr;
 }
 
-/*
 QPixmap fromCGImageRef(CGImageRef image)
 {
-    QPlatformNativeInterface::NativeResourceForIntegrationFunction func = resolvePlatformFunction("cgimagetoqimage");
+    QPlatformNativeInterface::NativeResourceForIntegrationFunction func = QApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("cgimagetoqimage");
     if (func) {
         typedef QImage (*CGImageToQImageFunction)(CGImageRef image);
         return QPixmap::fromImage(reinterpret_cast<CGImageToQImageFunction>(func)(image));
@@ -36,12 +37,29 @@ QPixmap fromCGImageRef(CGImageRef image)
     return QPixmap();
 }
 */
+/*
+inline QPlatformNativeInterface::NativeResourceForIntegrationFunction resolvePlatformFunction(const QByteArray &name)
+{
+    QPlatformNativeInterface::NativeResourceForIntegrationFunction func = QApplication::platformNativeInterface()->nativeResourceFunctionForIntegration(name);
+    if (!func)
+        qWarning() << "     +++ [Lib] {Notify}: unresolvable function" << name;
+    return func;
+}
+*/
 
 NSImage* toNSImage(const QPixmap &pixmap)
 {
     if (pixmap.isNull())
-        return 0;
-    CGImageRef cgimage = toCGImageRef(pixmap);
+        return nullptr;
+
+    CGImageRef cgimage = nullptr;
+
+    QPlatformNativeInterface::NativeResourceForIntegrationFunction func = QApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("qimagetocgimage");
+    if (func) {
+        typedef CGImageRef (*QImageToCGImageFunction)(const QImage &image);
+        cgimage = reinterpret_cast<QImageToCGImageFunction>(func)(pixmap.toImage());
+    }
+
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgimage];
     NSImage *image = [[NSImage alloc] init];
     [image addRepresentation:bitmapRep];

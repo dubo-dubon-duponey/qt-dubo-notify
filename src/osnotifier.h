@@ -30,7 +30,7 @@ class LIBDUBONOTIFYSHARED_EXPORT OSNotifier : public QObject
   Q_OBJECT
 
 public:
-  OSNotifier(Notifier * parent = nullptr): QObject(parent)
+  explicit OSNotifier(Notifier * parent = nullptr): QObject(parent)
   {
   }
 

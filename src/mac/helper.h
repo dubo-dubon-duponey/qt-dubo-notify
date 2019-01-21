@@ -17,21 +17,12 @@
 
 #include <QDebug>
 #include <QApplication>
-#include <qpa/qplatformnativeinterface.h>
 
-#import <Foundation/Foundation.h>
-
-inline QPlatformNativeInterface::NativeResourceForIntegrationFunction resolvePlatformFunction(const QByteArray &name)
-{
-    QPlatformNativeInterface::NativeResourceForIntegrationFunction func = QApplication::platformNativeInterface()->nativeResourceFunctionForIntegration(name);
-    if (!func)
-        qWarning() << "     +++ [Lib] {Notify}: unresolvable function" << name;
-    return func;
-}
+#include <Foundation/Foundation.h>
 
 static inline NSString* toNSString(const QString &string)
 {
-    return [NSString stringWithCharacters:(const unichar *)string.unicode() length:(NSUInteger)string.length()];
+    return [NSString stringWithUTF8String:string.toLocal8Bit().data()];
 }
 
 static inline QString toQString(NSString *string)

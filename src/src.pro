@@ -6,14 +6,6 @@ include($$PROJECT_ROOT/config/qmakeitup.pri)
 
 INCLUDEPATH += $$PWD
 
-DEFINES += LIBDUBONOTIFY_LIBRARY
-contains(DUBO_LINK_TYPE, static){
-    DEFINES += LIBDUBONOTIFY_USE_STATIC
-}
-
-copyToDestdir($$PWD/lib$${TARGET}/*.h, $$DESTDIR/../include/lib$${TARGET})
-copyToDestdir($$PWD/../res/redist/*, $$DESTDIR/../share/lib$${TARGET})
-
 SOURCES +=  $$PWD/root.cpp\
             $$PWD/notifier.cpp
 
@@ -24,24 +16,17 @@ HEADERS +=  $$PWD/lib$${TARGET}/global.h \
             $$PWD/osnotifier.h
 
 win32{
-#    INCLUDEPATH += $$PWD/win
-    SOURCES += $$PWD/win/apputils.cpp
 }
 
 unix:!mac{
-#    INCLUDEPATH += $$PWD/nux
-    HEADERS += $$PWD/nux/specialnotifier.h
-    SOURCES += $$PWD/nux/specialnotifier.cpp
+    HEADERS += $$PWD/nux/nuxnotifier.h
+    SOURCES += $$PWD/nux/nuxnotifier.cpp
 
 }
+
 mac{
-    # To get NSImage converter
-    # QT += macextras
-    # Only QT5?
     LIBS += -framework AppKit
     QT += gui-private
-#  -framework IOKit
-#    LIBS += -framework Carbon
 
     # Cocoa helper
     HEADERS +=              $$PWD/mac/cocoainit.h \

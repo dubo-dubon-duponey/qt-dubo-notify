@@ -1,7 +1,4 @@
-window.addEventListener("roxee", function(e){
-    // Our main object
-    var notifier = e.API.notifier;
-
+var libraryInfo = function(e){
     // Display library information
     var infos = e.API.root;
     var iNode = document.getElementById("info");
@@ -12,7 +9,13 @@ window.addEventListener("roxee", function(e){
         line.appendChild(document.createTextNode(i + ": " + infos[i]));
         iNode.appendChild(line)
     });
+};
 
+window.addEventListener("roxee", function(e){
+    libraryInfo(e);
+
+    // Our main object
+    var notifier = e.API.notifier;
     var activatedListener = function(notification){
         console.warn("A notification has been activated: " + notification.Identifier + " " + notification.Title);
         console.warn("User info was: " + JSON.stringify(notification.UserInfo));
@@ -29,12 +32,10 @@ window.addEventListener("roxee", function(e){
     // Listener for clicked notifications
     notifier.clicked.connect(function(notification){
         // XXX this is pretty awful. A proper javascript API on top of this is warranted
-        if (notification._hack){
+        if (notification._hack_no_double_connect){
             return;
         }
-        // You have to wait for the object to update
-        // This also means you will not get repeated content click
-        notification._hack = true;
+        notification._hack_no_double_connect = true;
 
         notification.activated.connect(function(){
             activatedListener(notification);
@@ -114,7 +115,7 @@ window.addEventListener("roxee", function(e){
     };
 
     var rem;
-    for (var i = 1; i < 5; i++){
+    for (i = 1; i < 5; i++){
         rem = document.getElementById("remove" + i);
         rem.removeAttribute("disabled");
         rem.onclick = remover.bind(this, i);

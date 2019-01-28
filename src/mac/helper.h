@@ -14,8 +14,6 @@
 
 #include <QString>
 #include <QPixmap>
-
-#include <QDebug>
 #include <QApplication>
 
 #include <Foundation/Foundation.h>

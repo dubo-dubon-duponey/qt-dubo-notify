@@ -18,12 +18,12 @@
 #ifdef Q_OS_MAC
 #include "mac/macnotifier.h"
 #elif defined(Q_OS_UNIX) && defined(Q_DBUS_EXPORT)
-#include "nux/specialnotifiernux.h"
+#include "nux/nuxnotifiernux.h"
 #else
-class SpecialNotifier : public DuboPlatipus::OSNotifier
+class LooseNotifier : public DuboPlatipus::OSNotifier
 {
 public:
-    explicit SpecialNotifier(QObject * parent = nullptr): DuboPlatipus::OSNotifier(parent)
+    explicit LooseNotifier(QObject * parent = nullptr): DuboPlatipus::OSNotifier(parent)
     {
 
     }
@@ -39,8 +39,8 @@ class Notifier::Private
         OSNotifier * notifier;
 };
 
-Notifier::Notifier(QObject * parent/*, QSystemTrayIcon * tray*/):
-    QObject(parent)/*, trayicon(tray)*/
+Notifier::Notifier(QObject * parent):
+    QObject(parent)
 {
     d = new Notifier::Private();
     // Use the implementation for the OS
@@ -65,7 +65,7 @@ bool Notifier::remove(const QString &identifier)
 {
     d->notifier->remove(identifier);
     QMap<QString, DuboNotify::Notification*>::iterator i = d->notificationsMap.find(identifier);
-    if (i == d->notificationsMap.constEnd())
+    if (i == d->notificationsMap.end())
         return false;
     d->notificationsMap.erase(i);
     return true;

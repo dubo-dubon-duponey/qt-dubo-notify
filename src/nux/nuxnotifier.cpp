@@ -25,7 +25,7 @@
 #include <QTemporaryFile>
 #include <QImageWriter>
 
-#include "nux/specialnotifier.h"
+#include "nuxnotifier.h"
 
 #include <QtDBus>
 #include <stdint.h>
@@ -114,18 +114,18 @@ QVariant FreedesktopImage::toVariant(const QImage &img)
     return QVariant(FreedesktopImage::metaType(), &fimg);
 }
 
-SpecialNotifier::SpecialNotifier(QSystemTrayIcon *trayicon, QWidget *parent):
-    QObject(parent)
+NuxNotifier::NuxNotifier(DuboNotify::Notifier *parent):
+    DuboNotify::OSNotifier(parent)
 {
     interface = new QDBusInterface("org.freedesktop.Notifications", "/org/freedesktop/Notifications", "org.freedesktop.Notifications");
 }
 
-SpecialNotifier::~SpecialNotifier()
+NuxNotifier::~NuxNotifier()
 {
     delete interface;
 }
 
-bool SpecialNotifier::canNotify()
+bool NuxNotifier::test()
 {
     if(!interface->isValid())
     {
@@ -134,7 +134,53 @@ bool SpecialNotifier::canNotify()
     return true;
 }
 
-bool SpecialNotifier::notify(const QString &appName, const QString &title, const QString &subtitle, const QString &text, const QIcon & icon, int tim)
+bool NuxNotifier::dispatch(DuboNotify::Notification * notification)
+{
+    if(!interface->isValid())
+    {
+        return false;
+    }
+
+    // Arguments for DBus call:
+    QList<QVariant> args;
+
+    // Program Name:
+    args.append(QString::fromLatin1("My Application:"));// XXX introduce appName somehow somewhere;
+
+    // Unique ID of this notification type:
+    args.append(0U);
+
+    // Application Icon, empty string
+    args.append(QString());
+
+    // Summary
+    args.append(notification->Title); // XXX + Subtitle?
+
+    // Body
+    args.append(notification->Informative);
+
+    // Actions (none, actions are deprecated)
+    QStringList actions;
+    args.append(actions);
+
+    // Hints
+    QVariantMap hints;
+
+    // If no icon specified, set icon based on class
+    QImage img = QIcon(* notification->Icon).pixmap(FREEDESKTOP_NOTIFICATION_ICON_SIZE).toImage();
+    hints[QString::fromLatin1("icon_data")] = FreedesktopImage::toVariant(img);
+    args.append(hints);
+
+    // Timeout (in msec)
+    args.append(1000); // XXX introduce time parameter?
+
+    // "Fire and forget"
+    interface->callWithArgumentList(QDBus::NoBlock, "Notify", args);
+    return true;
+}
+
+/*
+bool NuxNotifier::notify(const QString &appName, const QString &title, const QString &subtitle, const QString &text, const QIcon & icon, int time)
 {
     if(!interface->isValid())
     {
@@ -177,3 +223,5 @@ bool SpecialNotifier::notify(const QString &appName, const QString &title, const
     interface->callWithArgumentList(QDBus::NoBlock, "Notify", args);
     return true;
 }
+
+*/

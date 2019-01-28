@@ -13,8 +13,10 @@
 #define DUBONOTIFY_NOTIFIER_H
 
 #include "global.h"
+
 #include <QObject>
 #include <QVariant>
+
 #include "notification.h"
 
 /*! \namespace DuboNotify
@@ -58,21 +60,6 @@ private:
 signals:
     void clicked(DuboNotify::Notification * n);
     void presented(DuboNotify::Notification * n);
-
-
-    // QSystemTrayIcon * trayicon;
-    /*
-    Q_PROPERTY(int APP READ APP)
-    static int APP(){return QSystemTrayIcon::NoIcon;}
-    Q_PROPERTY(int INFO READ INFO)
-    static int INFO(){return QSystemTrayIcon::Information;}
-    Q_PROPERTY(int WARNING READ WARNING)
-    static int WARNING(){return QSystemTrayIcon::Warning;}
-    Q_PROPERTY(int CRITICAL READ CRITICAL)
-    static int CRITICAL(){return QSystemTrayIcon::Critical;}
-    Q_INVOKABLE bool canNotify();
-    */
-
 };
 
 }

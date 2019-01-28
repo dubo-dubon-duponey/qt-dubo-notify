@@ -16,8 +16,6 @@
 #include "libdubonotify/notification.h"
 #include "libdubonotify/notifier.h"
 #include <QObject>
-#include <QDebug>
-#include <QIcon>
 
 namespace DuboNotify {
 

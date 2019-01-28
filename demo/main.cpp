@@ -10,25 +10,24 @@
  */
 
 #include <QApplication>
-#include <QDebug>
+// #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
+#include <QtWebEngine>
+#include <QWebChannel>
+#include <QWebEngineView>
+#include <QWebEnginePage>
 #include <QWidget>
 
 #include <libdubonotify/root.h>
 #include <libdubonotify/notifier.h>
 
-#include <QtWebEngine>
-#include <QWebEngineView>
-#include <QWebEnginePage>
-#include <QFileInfo>
-#include <QDir>
-#include <QWebChannel>
-
 QWebChannel * SetupWebView()
 {
-    QFileInfo jsFileInfo(QDir::currentPath() + "/qwebchannel.js");
+    QFileInfo jsFileInfo(QDir::currentPath() + QString::fromUtf8("/qwebchannel.js"));
 
     if (!jsFileInfo.exists())
-        QFile::copy(":/qtwebchannel/qwebchannel.js", jsFileInfo.absoluteFilePath());
+        QFile::copy(QString::fromUtf8(":/qtwebchannel/qwebchannel.js"), jsFileInfo.absoluteFilePath());
 
     QtWebEngine::initialize();
     QWebEngineView * view = new QWebEngineView();
@@ -36,12 +35,13 @@ QWebChannel * SetupWebView()
     QWebChannel * channel = new QWebChannel(view->page());
     view->page()->setWebChannel(channel);
 
-    view->load(QUrl("qrc:/demo.html"));
+    view->load(QUrl(QString::fromUtf8("qrc:/demo.html")));
     view->show();
 
     return channel;
 }
 
+/*
 void OutputLibraryInfo(){
     DuboNotify::Root * root = new DuboNotify::Root();
     qDebug() << root->property("NAME");
@@ -75,10 +75,10 @@ int mainNoJavascript(int argc, char *argv[])
     // Create a notification
     DuboNotify::Notification * notif = new DuboNotify::Notification(notifier);
 
-    notif->Title = "Notification title";
-    notif->Subtitle = "Notification subtitle";
-    notif->Informative = "Notification informative text";
-    notif->Identifier = "id1";
+    notif->Title = QString::fromUtf8("Notification title");
+    notif->Subtitle = QString::fromUtf8("Notification subtitle");
+    notif->Informative = QString::fromUtf8("Notification informative text");
+    notif->Identifier = QString::fromUtf8("id1");
     notif->HasReplyButton = false;
     notif->HasActionButton = false;
 
@@ -88,24 +88,25 @@ int mainNoJavascript(int argc, char *argv[])
     // Add more stuff
     notif->HasReplyButton = false;
     notif->HasActionButton = true;
-    notif->ActionButtonTitle = "An action";
-    notif->OtherButtonTitle = "A close button";
+    notif->ActionButtonTitle = QString::fromUtf8("An action");
+    notif->OtherButtonTitle = QString::fromUtf8("A close button");
     QList<QString> list;
-    list << "alpha action" << "beta action" << "delta action";
+    list << QString::fromUtf8("alpha action") << QString::fromUtf8("beta action") << QString::fromUtf8("delta action");
     notif->setProperty("AdditionalActions", QVariant(list));
-    notif->ResponsePlaceholder = "Placeholder";
+    notif->ResponsePlaceholder = QString::fromUtf8("Placeholder");
     notif->SoundName = notif->SOUND_BLOW();
-    notif->Icon = new QPixmap(":/demo.jpg");
-    notif->UserInfo["a ∞"] = "thing";
-    notif->UserInfo["another ∞"] = "thing";
-    notif->Title = "Another";
-    notif->Identifier = "id2";
+    notif->Icon = new QPixmap(QString::fromUtf8(":/demo.jpg"));
+    notif->UserInfo[QString::fromUtf8("a ∞")] = QString::fromUtf8("thing");
+    notif->UserInfo[QString::fromUtf8("another ∞")] = QString::fromUtf8("thing");
+    notif->Title = QString::fromUtf8("Another");
+    notif->Identifier = QString::fromUtf8("id2");
 
     // Dispatch it
     notifier->dispatch(notif);
 
     return app.exec();
 }
+*/
 
 int mainJavascript(int argc, char *argv[])
 {
@@ -116,12 +117,10 @@ int mainJavascript(int argc, char *argv[])
     QWebChannel * chan = SetupWebView();
 
     // Instanciate the notifier
-    DuboNotify::Notifier * notifier = new DuboNotify::Notifier(chan);
-
-    // Attach objects to the javascript context
     DuboNotify::Root * root = new DuboNotify::Root();
-    chan->registerObject("Root", root);
-    chan->registerObject("Notifier", notifier);
+    DuboNotify::Notifier * notifier = new DuboNotify::Notifier(chan);
+    chan->registerObject(QString::fromUtf8("Root"), root);
+    chan->registerObject(QString::fromUtf8("Notifier"), notifier);
 
     return app.exec();
 }

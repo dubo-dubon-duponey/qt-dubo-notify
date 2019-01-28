@@ -93,7 +93,6 @@ MacNotifier::~MacNotifier()
 void MacNotifier::notificationDelivered(id notification)
 {
     NSUserNotification * notif = notification;
-    qDebug() << "Delivered" << [notif identifier];
 
     // Get the notifier
     DuboNotify::Notifier * notifier = qobject_cast<DuboNotify::Notifier *>(this->parent());
@@ -103,7 +102,7 @@ void MacNotifier::notificationDelivered(id notification)
     // Set the userInfo in case it's a new object
     QMap<QString, QString> info = QMap<QString, QString>();
     for(id key in [notif userInfo]){
-        NSLog(@"key=%@ value=%@", key, [[notif userInfo] objectForKey:key]);
+        // NSLog(@"key=%@ value=%@", key, [[notif userInfo] objectForKey:key]);
         info[toQString(key)] = toQString([[notif userInfo] objectForKey:key]);
     }
     n->UserInfo = info;
@@ -115,7 +114,6 @@ void MacNotifier::notificationDelivered(id notification)
 void MacNotifier::notificationClicked(id notification)
 {
     NSUserNotification * notif = notification;
-    qDebug() << "Clicked";
 
     // Get the notifier
     DuboNotify::Notifier * notifier = qobject_cast<DuboNotify::Notifier *>(this->parent());
@@ -125,10 +123,12 @@ void MacNotifier::notificationClicked(id notification)
     // Set the userInfo in case it's a new object
     QMap<QString, QString> info = QMap<QString, QString>();
     for(id key in [notif userInfo]){
-        NSLog(@"key=%@ value=%@", key, [[notif userInfo] objectForKey:key]);
+        // NSLog(@"key=%@ value=%@", key, [[notif userInfo] objectForKey:key]);
         info[toQString(key)] = toQString([[notif userInfo] objectForKey:key]);
     }
     n->UserInfo = info;
+    emit n->updated();
+
     // Client should assume it doesn't necessarily get these, which are purely informative and should not contain data
     /*    n->Title = toQString([notification title]);
         n->Subtitle = toQString([notification subtitle]);
@@ -139,19 +139,20 @@ void MacNotifier::notificationClicked(id notification)
     //    n->OtherButtonTitle = toQString([notification otherButtonTitle]);
     */
 
-    // Set any property pertaining to the response
-    n->setProperty("Response", toQString([[notif response] string]));
-    n->setProperty("AdditionalActivationAction", toQString([[notif additionalActivationAction] identifier]));
-    n->setProperty("ActivationType", int([notif activationType]));
+    // Set properties pertaining to the response
+    n->Response = toQString([[notif response] string]);
+    n->AdditionalActivationAction = toQString([[notif additionalActivationAction] identifier]);
+    n->ActivationType = DuboNotify::Notification::NotificationActivation([notif activationType]);
+
+    // Let it known that a notification has been clicked (it doesn't matter where this is sent, because it always arrives first...)
+    emit notifier->clicked(n);
+    // Then let it known that the notification has been activated...
+    emit n->activated();
     /*
     [notification actualDeliveryDate];
     [notification isPresented];
     [notification isRemote];
     */
-
-    // Careful! Changes are not live in the notification yet :s
-    // XXX this is heinous shit - need something better - some of the properties may or may not have changed...
-    emit notifier->clicked(n);
 }
 
 bool MacNotifier::dispatch(DuboNotify::Notification * data)
@@ -167,8 +168,11 @@ bool MacNotifier::dispatch(DuboNotify::Notification * data)
     [userNotification setValue:toNSString(data->Identifier) forKey:@"identifier"];
     [userNotification setValue:toNSString(data->ResponsePlaceholder) forKey:@"responsePlaceholder"];
 
-    if (data->SoundName.length() >= 0){
-        [userNotification setValue:toNSString(data->SoundName) forKey:@"soundName"];
+    QString soundName = data->getSoundName(data->SoundName);
+    if (soundName.length() > 0){
+        [userNotification setValue:toNSString(soundName) forKey:@"soundName"];
+    }else{
+        [userNotification setValue:nullptr forKey:@"soundName"];
     }
 
     [userNotification setValue:@(data->HasReplyButton) forKey:@"hasReplyButton"];
@@ -178,8 +182,6 @@ bool MacNotifier::dispatch(DuboNotify::Notification * data)
     // Handle the possible actions
     if (data->HasActionButton && !data->HasReplyButton){
         [userNotification setValue:toNSString(data->ActionButtonTitle) forKey:@"actionButtonTitle"];
-        qDebug() << "************** Additional actions";
-        qDebug() << data->AdditionalActions;
         if (data->AdditionalActions.length() > 0){
             NSMutableArray * actions = [[NSMutableArray alloc] init];
             for (int i = 0; i < data->AdditionalActions.length(); ++i) {

@@ -12,25 +12,28 @@
 #ifndef NUX_NOTIFIER_H
 #define NUX_NOTIFIER_H
 
-#include "lib/osnotifier.h"
+#include "osnotifier.h"
+#include "libdubonotify/notification.h"
+#include <QIcon>
 
 QT_BEGIN_NAMESPACE
 class QDBusInterface;
 QT_END_NAMESPACE
 
-class SpecialNotifier : public DuboNotify::OSNotifier
+class NuxNotifier : public DuboNotify::OSNotifier
 {
 
 public:
-    explicit SpecialNotifier(QObject * parent = nullptr): OSNotifier(parent)
-    {
-    }
+    explicit NuxNotifier(DuboNotify::Notifier * parent);
+    ~NuxNotifier();
 
-    bool notify(const QString &appName, const QString &title, const QString &subtitle, const QString &text, const QIcon & icon = QIcon(), int time = 10000);
-    bool canNotify();
+    bool dispatch(DuboNotify::Notification * notification);
+    bool test();
+    //    bool notify(const QString &appName, const QString &title, const QString &subtitle, const QString &text, const QIcon & icon = QIcon(), int time = 10000);
 
 private:
     QDBusInterface *interface;
 };
 
 #endif // NUX_NOTIFIER_H
+

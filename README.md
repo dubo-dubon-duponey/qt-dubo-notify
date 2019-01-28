@@ -68,8 +68,21 @@ More:
 
 ## TODO
 
+ * Focus on https://developer.apple.com/design/human-interface-guidelines/macos/system-capabilities/notifications/
  * delivery timing
  * push notifications
  * custom app bundled sounds
- * https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification
 
+Interesting stuff from Electron ecosystem:
+
+* look into incorporating something like: https://github.com/felixrieseberg/macos-notification-state
+ * https://github.com/CharlieHess/node-mac-notifier
+ * look into the HTML5 API: https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification
+ * linux investigate libnotify: https://wiki.archlinux.org/index.php/Desktop_notifications
+
+macOS sounds locations:
+
+ * ~/Library/Sounds
+ * /Library/Sounds
+ * /Network/Library/Sounds
+ * /System/Library/Sounds

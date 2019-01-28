@@ -18,7 +18,7 @@
 
 /*
 // Hide away platform details
-class MacNotifier::Private
+class NativeNotifier::Private
 {
     public:
         id NotificationCenterWrapped;
@@ -28,8 +28,8 @@ class MacNotifier::Private
 @interface DuboNotifyNotificationCenterDelegate : NSObject <NSUserNotificationCenterDelegate> {
 }
 
-  @property (atomic) MacNotifier* observer;
-- (DuboNotifyNotificationCenterDelegate*) initialise:(MacNotifier*)observer;
+  @property (atomic) NativeNotifier* observer;
+- (DuboNotifyNotificationCenterDelegate*) initialise:(NativeNotifier*)observer;
 - (void) userNotificationCenter:(NSUserNotificationCenter *)center didDeliverNotification:(NSUserNotification *)notification;
 - (void) userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification;
 - (BOOL) userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification;
@@ -38,7 +38,7 @@ class MacNotifier::Private
 @implementation DuboNotifyNotificationCenterDelegate{
 }
 
-- (DuboNotifyNotificationCenterDelegate*) initialise:(MacNotifier*)obs
+- (DuboNotifyNotificationCenterDelegate*) initialise:(NativeNotifier*)obs
 {
     if ( (self = [super init]) )
         self.observer = obs;
@@ -66,7 +66,7 @@ class MacNotifier::Private
 
 @end
 
-MacNotifier::MacNotifier(DuboNotify::Notifier *parent) : OSNotifier(parent)
+NativeNotifier::NativeNotifier(DuboNotify::Notifier *parent) : OSNotifier(parent)
 {
     CocoaInitializer initializer;
 
@@ -74,7 +74,7 @@ MacNotifier::MacNotifier(DuboNotify::Notifier *parent) : OSNotifier(parent)
     DuboNotifyNotificationCenterDelegate * delegate = [[DuboNotifyNotificationCenterDelegate alloc] initialise: this];
 
     // Store it
-    /*d = new MacNotifier::Private();
+    /*d = new NativeNotifier::Private();
     d->NotificationCenterWrapped = delegate;*/
 
     // Set it as delegate
@@ -84,13 +84,13 @@ MacNotifier::MacNotifier(DuboNotify::Notifier *parent) : OSNotifier(parent)
     // this->clean();
 }
 
-MacNotifier::~MacNotifier()
+NativeNotifier::~NativeNotifier()
 {
     // Should we do that when stopping?
     // this->clean();
 }
 
-void MacNotifier::notificationDelivered(id notification)
+void NativeNotifier::notificationDelivered(id notification)
 {
     NSUserNotification * notif = notification;
 
@@ -111,7 +111,7 @@ void MacNotifier::notificationDelivered(id notification)
     emit notifier->presented(n);
 }
 
-void MacNotifier::notificationClicked(id notification)
+void NativeNotifier::notificationClicked(id notification)
 {
     NSUserNotification * notif = notification;
 
@@ -155,7 +155,7 @@ void MacNotifier::notificationClicked(id notification)
     */
 }
 
-bool MacNotifier::dispatch(DuboNotify::Notification * data)
+bool NativeNotifier::dispatch(DuboNotify::Notification * data)
 {
     // Create the nofication
     // Class userNotificationClass     = NSClassFromString(@"NSUserNotification");
@@ -217,7 +217,7 @@ bool MacNotifier::dispatch(DuboNotify::Notification * data)
     return true;
 }
 
-bool MacNotifier::remove(const QString &identifier)
+bool NativeNotifier::remove(const QString &identifier)
 {
     NSUserNotificationCenter *notificationCenter = [NSUserNotificationCenter defaultUserNotificationCenter];
     for (NSUserNotification *deliveredUserNotification in [notificationCenter deliveredNotifications])
@@ -230,12 +230,12 @@ bool MacNotifier::remove(const QString &identifier)
     return false;
 }
 
-void MacNotifier::clean()
+void NativeNotifier::clean()
 {
     [[NSUserNotificationCenter defaultUserNotificationCenter] removeAllDeliveredNotifications];
 }
 
-bool MacNotifier::test()
+bool NativeNotifier::test()
 {
     return NSClassFromString(@"NSUserNotificationCenter") != nil;
 }

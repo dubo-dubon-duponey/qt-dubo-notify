@@ -16,12 +16,12 @@
 #include "libdubonotify/notification.h"
 #include "osnotifier.h"
 
-class MacNotifier : public DuboNotify::OSNotifier
+class NativeNotifier : public DuboNotify::OSNotifier
 {
     Q_OBJECT
 public:
-    explicit MacNotifier(DuboNotify::Notifier *parent);
-    ~MacNotifier();
+    explicit NativeNotifier(DuboNotify::Notifier *parent);
+    ~NativeNotifier();
 
 public:
     bool dispatch(DuboNotify::Notification * data);

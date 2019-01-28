@@ -20,10 +20,10 @@
 #elif defined(Q_OS_UNIX) && defined(Q_DBUS_EXPORT)
 #include "nux/nuxnotifiernux.h"
 #else
-class LooseNotifier : public DuboPlatipus::OSNotifier
+class NativeNotifier : public DuboNotify::OSNotifier
 {
 public:
-    explicit LooseNotifier(QObject * parent = nullptr): DuboPlatipus::OSNotifier(parent)
+    explicit NativeNotifier(DuboNotify::Notifier * parent): DuboNotify::OSNotifier(parent)
     {
 
     }
@@ -44,7 +44,7 @@ Notifier::Notifier(QObject * parent):
 {
     d = new Notifier::Private();
     // Use the implementation for the OS
-    d->notifier = new MacNotifier(this);
+    d->notifier = new NativeNotifier(this);
 }
 
 /*

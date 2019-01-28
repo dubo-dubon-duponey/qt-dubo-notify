@@ -114,18 +114,18 @@ QVariant FreedesktopImage::toVariant(const QImage &img)
     return QVariant(FreedesktopImage::metaType(), &fimg);
 }
 
-NuxNotifier::NuxNotifier(DuboNotify::Notifier *parent):
+NativeNotifier::NativeNotifier(DuboNotify::Notifier *parent):
     DuboNotify::OSNotifier(parent)
 {
-    interface = new QDBusInterface("org.freedesktop.Notifications", "/org/freedesktop/Notifications", "org.freedesktop.Notifications");
+    interface = new QDBusInterface(QString::fromLatin1("org.freedesktop.Notifications"), QString::fromLatin1("/org/freedesktop/Notifications"), QString::fromLatin1("org.freedesktop.Notifications"));
 }
 
-NuxNotifier::~NuxNotifier()
+NativeNotifier::~NativeNotifier()
 {
     delete interface;
 }
 
-bool NuxNotifier::test()
+bool NativeNotifier::test()
 {
     if(!interface->isValid())
     {
@@ -134,7 +134,7 @@ bool NuxNotifier::test()
     return true;
 }
 
-bool NuxNotifier::dispatch(DuboNotify::Notification * notification)
+bool NativeNotifier::dispatch(DuboNotify::Notification * notification)
 {
     if(!interface->isValid())
     {
@@ -175,12 +175,12 @@ bool NuxNotifier::dispatch(DuboNotify::Notification * notification)
     args.append(1000); // XXX introduce time parameter?
 
     // "Fire and forget"
-    interface->callWithArgumentList(QDBus::NoBlock, "Notify", args);
+    interface->callWithArgumentList(QDBus::NoBlock, QString::fromLatin1("Notify"), args);
     return true;
 }
 
 /*
-bool NuxNotifier::notify(const QString &appName, const QString &title, const QString &subtitle, const QString &text, const QIcon & icon, int time)
+bool NativeNotifier::notify(const QString &appName, const QString &title, const QString &subtitle, const QString &text, const QIcon & icon, int time)
 {
     if(!interface->isValid())
     {

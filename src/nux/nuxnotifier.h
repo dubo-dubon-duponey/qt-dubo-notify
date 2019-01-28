@@ -20,12 +20,12 @@ QT_BEGIN_NAMESPACE
 class QDBusInterface;
 QT_END_NAMESPACE
 
-class NuxNotifier : public DuboNotify::OSNotifier
+class NativeNotifier : public DuboNotify::OSNotifier
 {
 
 public:
-    explicit NuxNotifier(DuboNotify::Notifier * parent);
-    ~NuxNotifier();
+    explicit NativeNotifier(DuboNotify::Notifier * parent);
+    ~NativeNotifier();
 
     bool dispatch(DuboNotify::Notification * notification);
     bool test();

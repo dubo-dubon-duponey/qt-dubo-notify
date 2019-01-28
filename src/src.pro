@@ -21,7 +21,7 @@ win32{
 unix:!mac{
     HEADERS += $$PWD/nux/nuxnotifier.h
     SOURCES += $$PWD/nux/nuxnotifier.cpp
-
+    QT += dbus
 }
 
 mac{

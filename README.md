@@ -6,9 +6,7 @@
 > Fully scriptable, they are primarily meant for javascript (from a QWebEngine) - thought they are usable as well in plain QT.
 > Put together, these components should provide a comprehensive foundation for these building a "WebRunner", similarly to Electron.
 
-DuboNotify is a (tentatively) cross-platform notification library.
-
-macOS only for now.
+DuboNotify is a notification library for macOS.
 
 Licensed under BSD2.
 
@@ -78,7 +76,11 @@ Interesting stuff from Electron ecosystem:
 * look into incorporating something like: https://github.com/felixrieseberg/macos-notification-state
  * https://github.com/CharlieHess/node-mac-notifier
  * look into the HTML5 API: https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification
- * linux investigate libnotify: https://wiki.archlinux.org/index.php/Desktop_notifications
+
+Linux:
+
+ * investigate libnotify: https://wiki.archlinux.org/index.php/Desktop_notifications
+ * or https://github.com/velnias75/libnotify-qt
 
 macOS sounds locations:
 

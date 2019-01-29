@@ -48,6 +48,8 @@ public:
     Q_INVOKABLE bool remove(const QString &identifier);
     /*! \brief Remove all notifications.*/
     Q_INVOKABLE bool removeAll();
+    /*! \brief Test if notifications can be sent.*/
+    Q_INVOKABLE bool test();
 
     /*! \cond */
     Notification * read(const QString &identifier);

@@ -22,6 +22,12 @@ unix:!mac{
     HEADERS += $$PWD/nux/nuxnotifier.h
     SOURCES += $$PWD/nux/nuxnotifier.cpp
     QT += dbus
+    # Not really awesome...
+    CONFIG += link_pkgconfig
+    PKGCONFIG += libnotify
+
+    # XXX Runtime depends on sudo apt-get install libqt5webenginewidgets5
+    # build time: libglib2.0-dev libnotify-dev
 }
 
 mac{

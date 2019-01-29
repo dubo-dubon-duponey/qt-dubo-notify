@@ -93,6 +93,11 @@ QVariant Notifier::create()
     return QVariant::fromValue(static_cast<QObject *>(new Notification(this)));
 }
 
+bool Notifier::test()
+{
+    return d->notifier->test();
+}
+
 /*
 void Notifier::notify3(QObject * parent, Notification * notification)
 {

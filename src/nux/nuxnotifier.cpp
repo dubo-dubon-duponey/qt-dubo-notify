@@ -17,6 +17,7 @@
 #include <QMetaType>
 #include <QVariant>
 #include <QIcon>
+#include <QDebug>
 #include <QApplication>
 #include <QStyle>
 #include <QByteArray>
@@ -136,8 +137,26 @@ bool NativeNotifier::test()
 
 bool NativeNotifier::dispatch(DuboNotify::Notification * notification)
 {
+    qDebug() << "Is this supported?" << interface->isValid();
     if(!interface->isValid())
     {
+
+        /* NotifyNotification *notification;
+        notify_init("foo foo");
+        notification = notify_notification_new("foo foo",
+                                               "stext",
+                                               NULL);
+        if (!notification)
+          return false;
+        notify_notification_set_timeout(notification, 3000);
+        if (!notify_notification_show(notification, NULL))
+            qDebug("Failed to send notification");
+
+        g_object_unref(notification);*/
+
+        /*Notify::init("Hello world!");
+        Notify::Notification Hello("Hello world", "This is an example notification.", "dialog-information");
+        Hello.show();*/
         return false;
     }
 
@@ -178,50 +197,3 @@ bool NativeNotifier::dispatch(DuboNotify::Notification * notification)
     interface->callWithArgumentList(QDBus::NoBlock, QString::fromLatin1("Notify"), args);
     return true;
 }
-
-/*
-bool NativeNotifier::notify(const QString &appName, const QString &title, const QString &subtitle, const QString &text, const QIcon & icon, int time)
-{
-    if(!interface->isValid())
-    {
-        return false;
-    }
-
-    // Arguments for DBus call:
-    QList<QVariant> args;
-
-    // Program Name:
-    args.append(appName);
-
-    // Unique ID of this notification type:
-    args.append(0U);
-
-    // Application Icon, empty string
-    args.append(QString());
-
-    // Summary
-    args.append(title);
-
-    // Body
-    args.append(text);
-
-    // Actions (none, actions are deprecated)
-    QStringList actions;
-    args.append(actions);
-
-    // Hints
-    QVariantMap hints;
-
-    // If no icon specified, set icon based on class
-    hints["icon_data"] = FreedesktopImage::toVariant(icon.pixmap(FREEDESKTOP_NOTIFICATION_ICON_SIZE).toImage());
-    args.append(hints);
-
-    // Timeout (in msec)
-    args.append(time);
-
-    // "Fire and forget"
-    interface->callWithArgumentList(QDBus::NoBlock, "Notify", args);
-    return true;
-}
-
-*/

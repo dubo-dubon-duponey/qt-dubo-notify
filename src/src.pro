@@ -6,17 +6,14 @@ include($$PROJECT_ROOT/config/qmakeitup.pri)
 
 INCLUDEPATH += $$PWD
 
-SOURCES +=  $$PWD/root.cpp\
-            $$PWD/notifier.cpp
-
 HEADERS +=  $$PWD/lib$${TARGET}/global.h \
             $$PWD/lib$${TARGET}/root.h \
             $$PWD/lib$${TARGET}/notifier.h \
             $$PWD/lib$${TARGET}/notification.h \
             $$PWD/osnotifier.h
 
-win32{
-}
+SOURCES +=  $$PWD/root.cpp\
+            $$PWD/notifier.cpp
 
 unix:!mac{
     HEADERS += $$PWD/nux/nuxnotifier.h

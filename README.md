@@ -6,7 +6,9 @@
 > Fully scriptable, they are primarily meant for javascript (from a QWebEngine) - thought they are usable as well in plain QT.
 > Put together, these components should provide a comprehensive foundation for these building a "WebRunner", similarly to Electron.
 
-DuboNotify is a notification library for macOS.
+DuboNotify is a QT (5) notification library for macOS (10.10+).
+
+Windows and Linux support may be added in the future.
 
 Licensed under BSD2.
 

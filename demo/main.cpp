@@ -28,7 +28,6 @@ QWebChannel * SetupWebView()
     if (!jsFileInfo.exists())
         QFile::copy(QString::fromUtf8(":/qtwebchannel/qwebchannel.js"), jsFileInfo.absoluteFilePath());
 
-    QtWebEngine::initialize();
     QWebEngineView * view = new QWebEngineView();
 
     QWebChannel * channel = new QWebChannel(view->page());
@@ -109,6 +108,8 @@ int mainNoJavascript(int argc, char *argv[])
 
 int mainJavascript(int argc, char *argv[])
 {
+    QtWebEngine::initialize();
+
     // Get your app going
     QApplication app(argc, argv);
 

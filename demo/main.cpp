@@ -12,7 +12,9 @@
 #include <QApplication>
 #include <QDir>
 #include <QFileInfo>
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
 #include <QtWebEngine>
+#endif
 #include <QWebChannel>
 #include <QWebEngineView>
 #include <QWebEnginePage>
@@ -108,7 +110,9 @@ int mainNoJavascript(int argc, char *argv[])
 
 int mainJavascript(int argc, char *argv[])
 {
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
     QtWebEngine::initialize();
+#endif
 
     // Get your app going
     QApplication app(argc, argv);
